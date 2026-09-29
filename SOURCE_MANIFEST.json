@@ -1,0 +1,337 @@
+[
+  {
+    "path": "Dockerfile",
+    "bytes": 1582,
+    "sha256": "4fb071d03d3a5fc1c91749ba0a8b42bd9af128dfe212f85a1817d2b7d71ccad5"
+  },
+  {
+    "path": ".dockerignore",
+    "bytes": 974,
+    "sha256": "bbb8e8d21caf2f09e25a476eeaca04010373c918914cf61d7f67b267189c6733"
+  },
+  {
+    "path": "render.yaml",
+    "bytes": 329,
+    "sha256": "7fceff0480c3dff668b57926b93dfe4f85380de3aced46db07d69465be906822"
+  },
+  {
+    "path": "web/package.json",
+    "bytes": 532,
+    "sha256": "37659055ba045fb063800a5b2677b319e67026db56cb9f78c4c47698a92c9cde"
+  },
+  {
+    "path": "web/pnpm-lock.yaml",
+    "bytes": 30531,
+    "sha256": "f223b7b4c554102f1b37a07aeed6258b3c84eb3adaf802928567544680a94865"
+  },
+  {
+    "path": "web/.npmrc",
+    "bytes": 16,
+    "sha256": "be85cc462e740587626bbcbb1c3ed1c40b26e62ec072e8cbd2768f23915c28e6"
+  },
+  {
+    "path": "web/next.config.ts",
+    "bytes": 332,
+    "sha256": "1fb653416664964e34c277b751cb0d51537d519c0fbf1ead3834975bda09f613"
+  },
+  {
+    "path": "web/tsconfig.json",
+    "bytes": 657,
+    "sha256": "1abf2cd3ca95b468e459348a6c6b09d36bfc35b92382d1f1e3ee6b64a15944c5"
+  },
+  {
+    "path": "web/proxy.ts",
+    "bytes": 850,
+    "sha256": "05c798d0c64322803f511ea2cf6a0851e34464599d6a53214ef5d923aeb85fb4"
+  },
+  {
+    "path": "migration_tools/web_excel_worker.py",
+    "bytes": 2914,
+    "sha256": "c0815134c573758bcfe2fc87c4f944fd6ba7b3fafbd1fd5e25ca62e11786463c"
+  },
+  {
+    "path": "web/app/globals.css",
+    "bytes": 9737,
+    "sha256": "362730ebe24b4b5a1eef4f9753694d2f656dd8759c2b5a4f2466301dedce458c"
+  },
+  {
+    "path": "web/app/layout.tsx",
+    "bytes": 320,
+    "sha256": "40af14a1bc2271a825446b4c4bd546c8c85d296c652bce0be9f33f7759e2bf1f"
+  },
+  {
+    "path": "web/app/legacy-preview.tsx",
+    "bytes": 11382,
+    "sha256": "e95cc09e374818b3ee4ecff3dbeadc1fa8f8d75b162076e48a043f2848fc36e1"
+  },
+  {
+    "path": "web/app/legacy.css",
+    "bytes": 8094,
+    "sha256": "9c43ba79bfc3fac2e56285a43eef08c3c38a6d249372c0840c83338d89640ee1"
+  },
+  {
+    "path": "web/app/page.tsx",
+    "bytes": 550,
+    "sha256": "f06234155fe981c2ac3b6ca728781c8af8b57fda10c4ca65ddc3ae7505fbd708"
+  },
+  {
+    "path": "web/app/preview.tsx",
+    "bytes": 7800,
+    "sha256": "858e3fe5e689b222c4f0a3dcdfb2bc3721c3da95bc1a6c7978d06148acc6d1cd"
+  },
+  {
+    "path": "web/app/login/actions.ts",
+    "bytes": 2019,
+    "sha256": "ae42e37cbb1a5b9d81dc3890e1d3f1b4e87c40be0bab2d455264fd2ceb179316"
+  },
+  {
+    "path": "web/app/login/form.tsx",
+    "bytes": 617,
+    "sha256": "3c17e16752ce32ba0835010135626599d4dd74a6c7a6975c8794ddcca53cdc60"
+  },
+  {
+    "path": "web/app/login/page.tsx",
+    "bytes": 780,
+    "sha256": "eadcb7396c853b48e4d4f9711872ec2beb68c0b19595806700182d5f867f9cb3"
+  },
+  {
+    "path": "web/app/projects/actions.ts",
+    "bytes": 2154,
+    "sha256": "57f7c043780bea07a9a92af20884eb82897be4385fced4750910eb2b8e0bb585"
+  },
+  {
+    "path": "web/app/projects/forms.tsx",
+    "bytes": 3392,
+    "sha256": "a8dc12ca84297944d6f2891b7975198aa22fe3d49d22d5d8364088f35b9866a2"
+  },
+  {
+    "path": "web/app/projects/page.tsx",
+    "bytes": 2042,
+    "sha256": "c7ad737a808b6cbe5d3a835330834b5a693c8af0cb871df3c45a0a3fa5128918"
+  },
+  {
+    "path": "web/app/download/[key]/route.ts",
+    "bytes": 1390,
+    "sha256": "365e62c3f6c1bc9a11ea790894b440f8dfbee34e1f2fb486f5cdf265f1570915"
+  },
+  {
+    "path": "web/app/projects/[id]/page.tsx",
+    "bytes": 2382,
+    "sha256": "35dbb8cfc14cd8bb7dc08d07cd069797e3668905b31bee1ee5cc40a1d5a9b77b"
+  },
+  {
+    "path": "web/app/projects/[id]/export/form.tsx",
+    "bytes": 1928,
+    "sha256": "9d5236f1ec5a51f2a34fe64166ff6ea44df21c0ca68c65110abb8f451b4a79a8"
+  },
+  {
+    "path": "web/app/projects/[id]/export/page.tsx",
+    "bytes": 4196,
+    "sha256": "048ad1d1f742fccf2699dd9498226475787655e7febad4f999e058b80deb08c1"
+  },
+  {
+    "path": "web/app/projects/[id]/prior/actions.ts",
+    "bytes": 2227,
+    "sha256": "1a4a89fc630b60e73f0c5497a2681a06f571da1d56f83c2ff9a683d3cbf0493a"
+  },
+  {
+    "path": "web/app/projects/[id]/prior/editor.tsx",
+    "bytes": 5569,
+    "sha256": "f02fde4b15a20b4fcfbcf2390d013e2394c11342bb72844a2d4c18224587551d"
+  },
+  {
+    "path": "web/app/projects/[id]/prior/page.tsx",
+    "bytes": 4329,
+    "sha256": "c144730115c88a6835966cf9458f2793ed344a47940417559a8dd0e37be1bbcb"
+  },
+  {
+    "path": "web/app/projects/[id]/quantities/actions.ts",
+    "bytes": 3518,
+    "sha256": "7c3d2ef67fe6e77f6f61f637f41b37a244469fc2407d356f15f534e6f08a449e"
+  },
+  {
+    "path": "web/app/projects/[id]/quantities/board.tsx",
+    "bytes": 7551,
+    "sha256": "a5679e2ccc4241027720784102612c0af89c930831a14e3c6786deb1490dd588"
+  },
+  {
+    "path": "web/app/projects/[id]/quantities/page.tsx",
+    "bytes": 4822,
+    "sha256": "b3510f121adcee092776b3e2e09485641e5a46ac7afebeb862378c2bb296b8ed"
+  },
+  {
+    "path": "web/app/projects/[id]/sites/actions.ts",
+    "bytes": 4323,
+    "sha256": "741ccffdf3d1466e069b430116dfa941d809a3dbf7ed52d6699637c850ec76c8"
+  },
+  {
+    "path": "web/app/projects/[id]/sites/assign-order.tsx",
+    "bytes": 1807,
+    "sha256": "b5e3f54b18894632bd1091a784df9851b8a21b4c68332c89fa20b4e301231b91"
+  },
+  {
+    "path": "web/app/projects/[id]/sites/editor.tsx",
+    "bytes": 2995,
+    "sha256": "8850b472c853143a3257eabe351db207660db1d28dae986c27833bc485e4a980"
+  },
+  {
+    "path": "web/app/projects/[id]/sites/page.tsx",
+    "bytes": 5259,
+    "sha256": "be5fa9de2a972980c2171fc3a3b09fd6b3e33872f8fbf342f09da2290242f264"
+  },
+  {
+    "path": "web/app/projects/[id]/sites/period-memory.tsx",
+    "bytes": 1028,
+    "sha256": "4a6d2334295ee1f59bb830d76e13f4ad90af61474df79ec5990db5a35bd45c32"
+  },
+  {
+    "path": "web/app/projects/[id]/work-orders/actions.ts",
+    "bytes": 2210,
+    "sha256": "6ee1f628b43a35755c81bbb0143e89a9d5f5d4842786a9648a5d5f1862a05674"
+  },
+  {
+    "path": "web/app/projects/[id]/work-orders/form.tsx",
+    "bytes": 2398,
+    "sha256": "9225d4b4b423e8ba4d782b1d92484048f8f38fca61bb8343d26c323e922929cb"
+  },
+  {
+    "path": "web/app/projects/[id]/work-orders/page.tsx",
+    "bytes": 3582,
+    "sha256": "f96684cac78852c1775f5e8cfe0544d1d800f5acdb34050aa900d4ec32f446d7"
+  },
+  {
+    "path": "web/app/projects/[id]/export/download/route.ts",
+    "bytes": 2401,
+    "sha256": "983d894b001d1900a495ecdd5e88f61f5f27371927eab35e23d0eb79d8d9b6a8"
+  },
+  {
+    "path": "web/lib/config.ts",
+    "bytes": 741,
+    "sha256": "9d16899e036a412ff9370fb797f9033d00bca801bae1b19c9d94d84c202495c1"
+  },
+  {
+    "path": "web/lib/excel-worker.ts",
+    "bytes": 1602,
+    "sha256": "95db77f6c9b56d9e003bb6b2071bae1a68663af820caa4000581af3627949157"
+  },
+  {
+    "path": "web/lib/export-data.ts",
+    "bytes": 1624,
+    "sha256": "56fc16fe3f8906973a1d4545482ab12adb2ce0f82900d813ae310f9403937ec4"
+  },
+  {
+    "path": "web/lib/export-snapshot.ts",
+    "bytes": 2465,
+    "sha256": "7594b6e0640e09606b0df25c25e8dc0fbf3b7a053aa638f0a848b3957e6c2fd0"
+  },
+  {
+    "path": "web/lib/legacy-catalog.json",
+    "bytes": 109137,
+    "sha256": "038dec4e0e496a4dce4d940ae826ce6dd82b6c3dc0411ea0764b47d1d335f156"
+  },
+  {
+    "path": "web/lib/legacy-work-dates.ts",
+    "bytes": 1990,
+    "sha256": "25d76a82dfe1e13ba720440a4d3e38d904a0372db4c824f95640ebbd0a157951"
+  },
+  {
+    "path": "web/lib/prior-paste.ts",
+    "bytes": 3259,
+    "sha256": "2497ae137ec897c23299cc70eb7d2ea0be7dd4f9d1e9c4e14292fb729679add3"
+  },
+  {
+    "path": "web/lib/project-validation.ts",
+    "bytes": 1292,
+    "sha256": "ecc20394dcc01ba0f1913daddc39dc40e9f4a85d04d644968713732985cb29d2"
+  },
+  {
+    "path": "web/lib/quantity-math.ts",
+    "bytes": 319,
+    "sha256": "711ca5db13633a744d66b3c1cfbbbb0a1ce10ed84ce78ebb4fda182a9d698c79"
+  },
+  {
+    "path": "web/lib/reporting-period.ts",
+    "bytes": 651,
+    "sha256": "ee78e2e0408597f3e220a69a7d85e78f80615473e89e612291fc9addfc13ad09"
+  },
+  {
+    "path": "web/lib/types.ts",
+    "bytes": 1123,
+    "sha256": "496eff80dfb44d00183a7287ec0d149758141d035dbf3dc8f9a758333af0e254"
+  },
+  {
+    "path": "web/lib/supabase/server.ts",
+    "bytes": 615,
+    "sha256": "b09401330d4b4d4f816a5f1aa01088c8a1a51c0f791531c623243478568b3966"
+  },
+  {
+    "path": "web/lib/supabase/session.ts",
+    "bytes": 425,
+    "sha256": "6e974f3c247b6cbcdb87a498fc443548d62a892793e7f90ae3ca06a8e95f827f"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/app/__init__.py",
+    "bytes": 2,
+    "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/app/models.py",
+    "bytes": 10508,
+    "sha256": "c01bf8ae4f79b2af2fb2845b708cb979c965b79c0bb9d220fedb2743bf013342"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/app/kinds.py",
+    "bytes": 3880,
+    "sha256": "f1084b35874876c26021413a8dfe6099c3410e23f31f4fadeef0c8128d830c2d"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/app/catalog.py",
+    "bytes": 643,
+    "sha256": "8de107331877d6433ee02bcbc6c66a02aa6cda183cf20fba75bc422408736c1d"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/app/exporter.py",
+    "bytes": 47799,
+    "sha256": "8a270958919961d142e7128e9c605afaa48799138d60268c1646168301d4165b"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/app/excel_utils.py",
+    "bytes": 5950,
+    "sha256": "a447f288ee7f10f5b1b486c9db81075be0e2f6435a2667a5e378735c0a05e348"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/app/paths.py",
+    "bytes": 513,
+    "sha256": "ad47d3d8f7b5621306a5cb87a7ffad40ee2957b065a2b1c4369782d3d2c7ceed"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/data/park/items.json",
+    "bytes": 66230,
+    "sha256": "cafce2299cd6d970b3528ada1962db6ddfc5753281eb37945a0c5f932864c90f"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/templates/park/construction_log.xlsx",
+    "bytes": 149472,
+    "sha256": "77209a1f258095c06938a8f74e2437a4520e9a8ea9999f53d2bb002a13d171c5"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/templates/park/settlement.xlsx",
+    "bytes": 76128,
+    "sha256": "0a16a36933be6be17a84ea5bcf9eb908295ee0e180b29cc2f598a09cbd03cae0"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/data/rainwater/items.json",
+    "bytes": 32376,
+    "sha256": "d06be5040074c404d10a970c557ab6c65b1f0723bdec50b6cfd428f157b770fd"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/templates/rainwater/construction_log.xlsx",
+    "bytes": 112939,
+    "sha256": "392447c184b83fe34ea313b7bd0f2e1fb0bcc675e2a36eb74483af42a6db4073"
+  },
+  {
+    "path": "baselines/20260920T151632Z/source/templates/rainwater/settlement.xlsx",
+    "bytes": 61464,
+    "sha256": "53c4ca5d672f02ada7c80cb141066d300cb1d530befb1fb85d13274b2dabb3fd"
+  }
+]
