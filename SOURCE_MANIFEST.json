@@ -66,8 +66,8 @@
   },
   {
     "path": "web/app/legacy.css",
-    "bytes": 9994,
-    "sha256": "e1ba515e84468fdc0eae2ab9ce14280402a3eb6acb0798d6d2be53808683658c"
+    "bytes": 12991,
+    "sha256": "dfd450084deb911e61a71e8846edc2d16f492742128f9d99e9bb79cfdbec7c13"
   },
   {
     "path": "web/app/page.tsx",
@@ -151,8 +151,8 @@
   },
   {
     "path": "web/app/projects/[id]/quantities/board.tsx",
-    "bytes": 7551,
-    "sha256": "a5679e2ccc4241027720784102612c0af89c930831a14e3c6786deb1490dd588"
+    "bytes": 8612,
+    "sha256": "57f218c595a6039f4b11470aaf89e6083c44160ac4606e56ec58e1fe1d3a9e2d"
   },
   {
     "path": "web/app/projects/[id]/quantities/page.tsx",
