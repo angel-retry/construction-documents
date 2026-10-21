@@ -176,13 +176,13 @@
   },
   {
     "path": "web/app/projects/[id]/quantities/actions.ts",
-    "bytes": 3518,
-    "sha256": "7c3d2ef67fe6e77f6f61f637f41b37a244469fc2407d356f15f534e6f08a449e"
+    "bytes": 4065,
+    "sha256": "dd39c02bf957454427b67c2e697b4741a47b22480c68e8fb3def8d14f492977f"
   },
   {
     "path": "web/app/projects/[id]/quantities/board.tsx",
-    "bytes": 8808,
-    "sha256": "667b6244e6274bf0335a121d4a04c94401694a4c8f34262a4d520d1c439065ae"
+    "bytes": 11310,
+    "sha256": "9b844acfbbf0b8ba2c00eb58276c69dd19f16539d4def93486e41d21f304ef3b"
   },
   {
     "path": "web/app/projects/[id]/quantities/page.tsx",
@@ -321,8 +321,8 @@
   },
   {
     "path": "web/package.json",
-    "bytes": 532,
-    "sha256": "37659055ba045fb063800a5b2677b319e67026db56cb9f78c4c47698a92c9cde"
+    "bytes": 793,
+    "sha256": "974a02fc46182e032d43228fc0dc2cb7ce268dad7e9adf146324a2d87265f36e"
   },
   {
     "path": "web/pnpm-lock.yaml",
@@ -338,5 +338,25 @@
     "path": "web/tsconfig.json",
     "bytes": 657,
     "sha256": "1abf2cd3ca95b468e459348a6c6b09d36bfc35b92382d1f1e3ee6b64a15944c5"
+  },
+  {
+    "path": "web/app/projects/[id]/quantities/save/route.ts",
+    "bytes": 719,
+    "sha256": "2ff6e2b232de910e6203c095d0fe9346a64172f32842b7712690874f021c57bb"
+  },
+  {
+    "path": "web/lib/quantity-save-queue.ts",
+    "bytes": 2898,
+    "sha256": "77e5a0c70d3c89cb03f6211b14338e16ff8a9ed218a975a9b5bffed4504435bf"
+  },
+  {
+    "path": "web/tests/quantity-save-queue.test.mjs",
+    "bytes": 4779,
+    "sha256": "86c6256982d09475d3526fb83cb923e87145ff54999b39ac8eb52a242786d042"
+  },
+  {
+    "path": "web/tests/quantity-actions.test.cjs",
+    "bytes": 3238,
+    "sha256": "bd7b2f47a0779fdf7e63bf8d666192f840d3a458f5cfa6dc27b381a264da751e"
   }
 ]
