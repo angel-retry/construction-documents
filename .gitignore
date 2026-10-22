@@ -1,0 +1,37 @@
+# 1. 套件依賴（包含 web/node_modules/）
+**/node_modules/
+**/.pnpm-store/
+
+# 2. Next.js 編譯與快取（包含 web/.next/）
+**/.next/
+**/out/
+**/dist/
+**/build/
+
+# 3. 敏感金鑰檔案（包含所有層級的 .env 與 .env.local）
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+**/.env.local
+**/.env*.local
+
+# 4. 本機快照資料
+**/.local-data/
+
+# 5. 日誌與暫存檔
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# 6. Python 虛擬環境與快取
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 7. 作業系統暫存
+.DS_Store
+Thumbs.db

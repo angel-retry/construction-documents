@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>實際完成數量與日誌填報看板</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --primary-light: #ecfdf5;
+      --dark-bar: #0f172a;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --bg: #f8fafc;
+      --badge-ok-bg: #dcfce7;
+      --badge-ok-text: #15803d;
+      --badge-warn-bg: #fef9c3;
+      --badge-warn-text: #a16207;
+      --badge-danger-bg: #fee2e2;
+      --badge-danger-text: #b91c1c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
+      background: #f1f5f9;
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .app-workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* 左側路段卡片欄 */
+    .sidebar {
+      width: 320px;
+      min-width: 300px;
+      background: white;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .site-card {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 4px solid transparent;
+    }
+
+    .site-card:hover { background: #f8fafc; }
+    .site-card.active {
+      background: var(--primary-light);
+      border-left-color: var(--primary);
+    }
+
+    .site-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .site-card.active .site-card-title { color: #065f46; }
+
+    .site-card-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .site-card-amount {
+      font-weight: 700;
+      color: #047857;
+      font-size: 13px;
+    }
+
+    /* 右側主工作區 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      overflow: hidden;
+      padding: 24px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .site-period-tag {
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      margin-left: 12px;
+    }
+
+    /* 表格容器 */
+    .table-container {
+      flex: 1;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    /* 固定窗格 */
+    .col-code { position: sticky; left: 0; z-index: 2; background: white; width: 65px; }
+    .col-name { position: sticky; left: 65px; z-index: 2; background: white; width: 140px; text-align: left; }
+    .col-unit { position: sticky; left: 205px; z-index: 2; background: white; width: 50px; }
+    .col-price { position: sticky; left: 255px; z-index: 2; background: white; width: 75px; text-align: right; }
+    .col-total { position: sticky; left: 330px; z-index: 2; background: #faf5ff; width: 95px; }
+    .col-amount { position: sticky; left: 425px; z-index: 2; background: white; width: 95px; text-align: right; }
+    .col-balance { position: sticky; left: 520px; z-index: 2; background: white; width: 120px; border-right: 2px solid #cbd5e1 !important; }
+
+    th.col-code, th.col-name, th.col-unit, th.col-price, th.col-total, th.col-amount, th.col-balance {
+      z-index: 12;
+      background: #f1f5f9;
+    }
+
+    input.input-number {
+      width: 70px;
+      padding: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      text-align: right;
+      font-size: 13px;
+    }
+    input.input-number:focus { outline: 2px solid var(--primary); }
+
+    input.input-note {
+      width: 130px;
+      padding: 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-ok { background: var(--badge-ok-bg); color: var(--badge-ok-text); }
+    .badge-warn { background: var(--badge-warn-bg); color: var(--badge-warn-text); }
+    .badge-danger { background: var(--badge-danger-bg); color: var(--badge-danger-text); }
+
+    .btn-action {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .btn-action:hover { background: #e2e8f0; }
+
+    .subtotal-area {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding-top: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .subtotal-num {
+      color: #047857;
+      font-size: 16px;
+      margin-left: 8px;
+    }
+
+    /* 底部深色總金額 Bar */
+    .footer-bar {
+      height: 52px;
+      background: var(--dark-bar);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .grand-total {
+      color: #34d399;
+      font-size: 18px;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-workspace">
+    <!-- 左側路段選擇 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span>施工路段清單</span>
+        <span id="siteCountBadge">6 個地點</span>
+      </div>
+      <div id="siteList"></div>
+    </aside>
+
+    <!-- 右側填報表格 -->
+    <main class="main-content">
+      <div class="toolbar">
+        <div>
+          <button class="btn-primary">+ 從主合約匯入項目</button>
+          <span style="font-weight: 700; font-size: 15px; margin-left: 12px;" id="currentSiteTitle"></span>
+          <span class="site-period-tag" id="currentSitePeriod"></span>
+        </div>
+        <div style="font-size: 12px; color: var(--muted);">
+          * 施工日期直接讀取路段設定，無需手動篩選
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-code">代碼</th>
+              <th class="col-name">工作項目</th>
+              <th class="col-unit">單位</th>
+              <th class="col-price">單價</th>
+              <th class="col-total">本月實際總量</th>
+              <th class="col-amount">金額 (複價)</th>
+              <th class="col-balance">每日分配核對</th>
+              <!-- 動態施工日期表頭 -->
+              <th id="dynamicDateHeaders" colspan="3">實際施工日完成數量</th>
+              <th>備註 (計算式)</th>
+              <th>操作</th>
+            </tr>
+            <tr id="subDateHeaders"></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="subtotal-area">
+        <span>本區小計金額 (Subtotal):</span>
+        <span class="subtotal-num" id="siteSubtotal">$0.00</span>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer-bar">
+    <div id="footerLocationCount">當前工單共計 6 個施工地點</div>
+    <div>
+      <span>今日所有工區綜合計金額 (Grand Total):</span>
+      <span class="grand-total" id="grandTotal">$0.00</span>
+    </div>
+  </footer>
+
+<script>
+  // 模擬資料 (完全契合使用者的真實情境)
+  const sites = [
+    {
+      id: "site-1",
+      code: "應053",
+      name: "中山路二段二巷-破管整修 (水利局交辦)",
+      period: "115/6/1 ~ 115/6/3",
+      workDays: [1, 2, 3], // 系統直接帶出這 3 天
+      items: [
+        { code: "171", name: "技術工", unit: "時", price: 414.83, total: 24, note: "3人*8H", days: { 1: 8, 2: 8, 3: 8 } },
+        { code: "178", name: "機具，小型貨車", unit: "時", price: 746.70, total: 8, note: "1台*8H", days: { 1: 3, 2: 3, 3: 0 } } // 尚缺 2
+      ]
+    },
+    {
+      id: "site-2",
+      code: "應054",
+      name: "中正路雙和醫院前機慢車道深孔-坑洞補修",
+      period: "115/6/1 單日施工",
+      workDays: [1],
+      items: [
+        { code: "02210", name: "瀝青拌合修補", unit: "包", price: 350, total: 15, note: "現場坑洞填平", days: { 1: 15 } }
+      ]
+    },
+    {
+      id: "site-3",
+      code: "應055",
+      name: "興南路一段93巷38弄1號-格柵損壞搶修",
+      period: "115/6/12 ~ 115/6/13",
+      workDays: [12, 13],
+      items: [
+        { code: "05501", name: "鍍鋅格柵板更換", unit: "座", price: 4200, total: 11, note: "急件更換", days: { 12: 6, 13: 5 } }
+      ]
+    },
+    {
+      id: "site-4",
+      code: "應056",
+      name: "國光街215巷10弄11號-格柵破損搶修",
+      period: "115/6/22",
+      workDays: [22],
+      items: []
+    },
+    {
+      id: "site-5",
+      code: "A05",
+      name: "115年6月份雨水人孔內部現況調查(含協議清單)",
+      period: "115/6/1 ~ 115/6/5",
+      workDays: [1, 2, 3, 4, 5],
+      items: []
+    },
+    {
+      id: "site-6",
+      code: "派工單05",
+      name: "秀山公園積水改善",
+      period: "115/7/3 ~ 115/7/5",
+      workDays: [3, 4, 5],
+      items: []
+    }
+  ];
+
+  let currentSiteIdx = 0;
+
+  function renderSidebar() {
+    const list = document.getElementById("siteList");
+    list.innerHTML = "";
+
+    sites.forEach((site, idx) => {
+      const subtotal = site.items.reduce((sum, item) => {
+        return sum + Math.floor(item.total * item.price * 100) / 100;
+      }, 0);
+
+      const card = document.createElement("div");
+      card.className = `site-card ${idx === currentSiteIdx ? "active" : ""}`;
+      card.onclick = () => switchSite(idx);
+
+      card.innerHTML = `
+        <div class="site-card-title">${site.code}_${site.name}</div>
+        <div class="site-card-meta">
+          <span>${site.period}</span>
+          <span class="site-card-amount">$${subtotal.toLocaleString("zh-TW", { minimumFractionDigits: 2 })}</span>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+
+    renderGrandTotal();
+  }
+
+  function renderMainTable() {
+    const site = sites[currentSiteIdx];
+    document.getElementById("currentSiteTitle").innerText = `${site.code} ${site.name}`;
+    document.getElementById("currentSitePeriod").innerText = `實際施工日：${site.period}`;
+
+    // 直接取用該路段的施工日
+    const displayDays = site.workDays;
+    document.getElementById("dynamicDateHeaders").colSpan = displayDays.length || 1;
+
+    // 建立日期次表頭
+    const subHeaders = document.getElementById("subDateHeaders");
+    let subHtml = `
+      <th class="col-code"></th><th class="col-name"></th><th class="col-unit"></th>
+      <th class="col-price"></th><th class="col-total"></th><th class="col-amount"></th>
+      <th class="col-balance"></th>
+    `;
+    displayDays.forEach(d => {
+      subHtml += `<th style="width: 75px;">${d}日</th>`;
+    });
+    subHtml += `<th></th><th></th>`;
+    subHeaders.innerHTML = subHtml;
+
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    if (site.items.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${7 + displayDays.length + 2}" style="padding: 40px; color: var(--muted);">該路段尚未加入任何工項。點擊上方「+ 從主合約匯入項目」加入。</td></tr>`;
+      document.getElementById("siteSubtotal").innerText = "$0.00";
+      return;
+    }
+
+    let siteSubtotal = 0;
+
+    site.items.forEach((item, itemIdx) => {
+      const row = document.createElement("tr");
+
+      // 計算日誌加總
+      let dailySum = 0;
+      displayDays.forEach(d => {
+        dailySum += Number(item.days[d] || 0);
+      });
+
+      const diff = Number(item.total) - dailySum;
+      let badgeHtml = "";
+      if (Math.abs(diff) < 0.0001) {
+        badgeHtml = `<span class="badge badge-ok">✓ 平衡 (已分 ${dailySum})</span>`;
+      } else if (diff > 0) {
+        badgeHtml = `<span class="badge badge-warn">⚠️ 尚欠 ${diff.toFixed(1)}</span>`;
+      } else {
+        badgeHtml = `<span class="badge badge-danger">❌ 超出 ${Math.abs(diff).toFixed(1)}</span>`;
+      }
+
+      const itemAmount = Math.floor(Number(item.total) * item.price * 100) / 100;
+      siteSubtotal += itemAmount;
+
+      let rowHtml = `
+        <td class="col-code">${item.code}</td>
+        <td class="col-name" title="${item.name}">${item.name}</td>
+        <td class="col-unit">${item.unit}</td>
+        <td class="col-price">$${item.price.toLocaleString("zh-TW", { minimumFractionDigits: 2 })}</td>
+        <td class="col-total">
+          <input type="number" class="input-number" value="${item.total}" onchange="changeTotal(${itemIdx}, this.value)" />
+        </td>
+        <td class="col-amount">$${itemAmount.toLocaleString("zh-TW", { minimumFractionDigits: 2 })}</td>
+        <td class="col-balance">${badgeHtml}</td>
+      `;
+
+      // 每日數量輸入
+      displayDays.forEach(day => {
+        const val = item.days[day] !== undefined ? item.days[day] : 0;
+        rowHtml += `
+          <td>
+            <input type="number" class="input-number" value="${val}" onchange="changeDaily(${itemIdx}, ${day}, this.value)" />
+          </td>
+        `;
+      });
+
+      // 備註欄 (記錄計算式)
+      rowHtml += `
+        <td>
+          <input type="text" class="input-note" value="${item.note || ''}" placeholder="如 3人*8H" onchange="changeNote(${itemIdx}, this.value)" />
+        </td>
+      `;
+
+      // 操作 (一鍵均分)
+      rowHtml += `
+        <td>
+          <button class="btn-action" onclick="autoDistribute(${itemIdx})">⚡ 均分</button>
+        </td>
+      `;
+
+      row.innerHTML = rowHtml;
+      tbody.appendChild(row);
+    });
+
+    document.getElementById("siteSubtotal").innerText = `$${siteSubtotal.toLocaleString("zh-TW", { minimumFractionDigits: 2 })}`;
+  }
+
+  function renderGrandTotal() {
+    let grand = 0;
+    sites.forEach(site => {
+      site.items.forEach(item => {
+        grand += Math.floor(item.total * item.price * 100) / 100;
+      });
+    });
+    document.getElementById("grandTotal").innerText = `$${grand.toLocaleString("zh-TW", { minimumFractionDigits: 2 })}`;
+  }
+
+  function switchSite(idx) {
+    currentSiteIdx = idx;
+    renderSidebar();
+    renderMainTable();
+  }
+
+  function changeTotal(itemIdx, val) {
+    sites[currentSiteIdx].items[itemIdx].total = Number(val) || 0;
+    renderSidebar();
+    renderMainTable();
+  }
+
+  function changeDaily(itemIdx, day, val) {
+    sites[currentSiteIdx].items[itemIdx].days[day] = Number(val) || 0;
+    renderMainTable();
+  }
+
+  function changeNote(itemIdx, val) {
+    sites[currentSiteIdx].items[itemIdx].note = val;
+  }
+
+  function autoDistribute(itemIdx) {
+    const site = sites[currentSiteIdx];
+    const item = site.items[itemIdx];
+    const days = site.workDays;
+    if (!days.length) return;
+
+    const base = Math.floor((item.total / days.length) * 10) / 10;
+    const remainder = Math.round((item.total - (base * days.length)) * 10) / 10;
+
+    days.forEach((d, i) => {
+      item.days[d] = i === days.length - 1 ? (base + remainder) : base;
+    });
+
+    renderMainTable();
+  }
+
+  // 初始加載
+  renderSidebar();
+  renderMainTable();
+</script>
+
+</body>
+</html>
