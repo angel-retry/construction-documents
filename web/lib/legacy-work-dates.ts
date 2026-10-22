@@ -59,3 +59,44 @@ export function workDatesToDays(
 	}
 	return days.length ? days : null;
 }
+
+/**
+ * 將勾選的日期陣列轉換為民國年連續區間字串。
+ * 例如：年 115、月 9、日期 [5, 10, 11, 12, 27, 28, 29]
+ * 輸出："115/9/5、115/9/10~115/9/12、115/9/27~115/9/29"
+ */
+export function formatDaysToRange(
+	year: number,
+	month: number,
+	days: number[],
+): string {
+	if (!days || !days.length) return "";
+	const sorted = Array.from(new Set(days.filter((d) => d >= 1 && d <= 31))).sort(
+		(a, b) => a - b,
+	);
+	if (!sorted.length) return "";
+
+	const groups: { start: number; end: number }[] = [];
+	let current = { start: sorted[0], end: sorted[0] };
+
+	for (let i = 1; i < sorted.length; i++) {
+		const day = sorted[i];
+		if (day === current.end + 1) {
+			current.end = day;
+		} else {
+			groups.push(current);
+			current = { start: day, end: day };
+		}
+	}
+	groups.push(current);
+
+	return groups
+		.map((g) => {
+			if (g.start === g.end) {
+				return `${year}/${month}/${g.start}`;
+			}
+			return `${year}/${month}/${g.start}~${year}/${month}/${g.end}`;
+		})
+		.join("、");
+}
+

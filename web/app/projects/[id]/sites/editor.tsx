@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { saveSite } from "./actions";
+import DateMultiPicker, { type DateMultiPickerHandle } from "./date-picker";
 export type MonthlySite = {
 	id: string;
 	item_number: number;
@@ -41,6 +42,7 @@ export default function SiteEditor({
 	});
 	const [dirty, setDirty] = useState(false);
 	const form = useRef<HTMLFormElement>(null);
+	const pickerRef = useRef<DateMultiPickerHandle>(null);
 	useEffect(() => {
 		if (state.ok) {
 			setDirty(false);
@@ -107,14 +109,35 @@ export default function SiteEditor({
 					</label>
 					<label className="old-field">
 						施工日期
-						<input
-							name="work_dates"
-							maxLength={2000}
-							placeholder="115/6/1、115/6/1-115/6/2、115/7/2、115/7/10"
-							value={draft.work_dates}
-							onChange={(e) => change("work_dates", e.target.value)}
-							onBlur={submit}
-						/>
+						<div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+							<input
+								readOnly
+								name="work_dates"
+								maxLength={2000}
+								placeholder="請點擊右方月曆選擇施工日期"
+								value={draft.work_dates}
+								onClick={() => pickerRef.current?.open()}
+								onBlur={submit}
+								style={{ flex: 1, cursor: "pointer", background: "#f8fafc" }}
+								title="施工日期僅供月曆選取，點擊開啟月曆"
+							/>
+							<DateMultiPicker
+								ref={pickerRef}
+								year={year}
+								month={month}
+								value={draft.work_dates}
+								onChange={(val) => {
+									change("work_dates", val);
+									// 若為既有路段，套用日期後自動提交儲存
+									if (row) {
+										setTimeout(() => {
+											form.current?.requestSubmit();
+										}, 50);
+									}
+								}}
+								disabled={pending}
+							/>
+						</div>
 					</label>
 					<label className="old-field">
 						備註
