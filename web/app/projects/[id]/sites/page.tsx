@@ -155,7 +155,7 @@ export default async function SitesPage({
 								<>
 									{canEdit ? (
 										<SiteManager
-											key={period.start}
+											key={`site-manager-${period.start}`}
 											project={id}
 											year={period.rocYear}
 											month={period.month}
