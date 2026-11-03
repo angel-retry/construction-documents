@@ -161,7 +161,19 @@ function SiteBlock({
 	const count = new Date(Date.UTC(year + 1911, month, 0)).getUTCDate();
 	const all = Array.from({ length: count }, (_, i) => i + 1);
 	const workDays = workDatesToDays(site.work_dates, year + 1911, month);
-	const visible = filter.length ? filter : workDays || all;
+	// 若有設定施工日則僅提供施工日勾選，未設定時退回顯示整月
+	const selectableDays = workDays && workDays.length > 0 ? workDays : all;
+	const isCustom = filter.length > 0;
+	const currentSelection = isCustom ? filter : selectableDays;
+	const visible = filter.length ? filter : selectableDays;
+	const isAllSelected =
+		selectableDays.length === currentSelection.length &&
+		selectableDays.every((d) => currentSelection.includes(d));
+	const filterSummary = isCustom
+		? `自訂篩選中（已選 ${filter.length}/${selectableDays.length} 天，點擊可調整）`
+		: workDays && workDays.length > 0
+			? `依施工路段連動（共 ${workDays.length} 天）`
+			: "未選擇時依原設定顯示，可複選日期";
 	const rows = targets
 		.filter(
 			(t: any) =>
@@ -238,31 +250,49 @@ function SiteBlock({
 					<div>
 						<span className="quantity-filter-label">顯示日期</span>
 						<details className="day-filter">
-							<summary>未選擇時依原設定顯示，可複選日期</summary>
+							<summary>{filterSummary}</summary>
 							<div className="quantity-days">
-								{all.map((day) => (
+								{selectableDays.map((day) => (
 									<label key={day}>
 										<input
 											type="checkbox"
-											checked={filter.includes(day)}
-											onChange={(e) =>
-												setFilter((v) =>
-													e.target.checked
-														? [...v, day].sort((a, b) => a - b)
-														: v.filter((d) => d !== day),
-												)
-											}
+											checked={currentSelection.includes(day)}
+											onChange={(e) => {
+												const next = e.target.checked
+													? [...currentSelection, day].sort((a, b) => a - b)
+													: currentSelection.filter((d) => d !== day);
+												setFilter(next);
+											}}
 										/>
 										{month}/{day}
 									</label>
 								))}
 							</div>
-							<button onClick={() => setFilter([])}>依施工日期顯示</button>
+							<div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+								<button
+									type="button"
+									onClick={() => setFilter([])}
+									disabled={!isCustom}
+								>
+									依施工日期顯示
+								</button>
+								{workDays && workDays.length > 0 && (
+									<button
+										type="button"
+										onClick={() => setFilter([...selectableDays])}
+										disabled={isAllSelected}
+									>
+										選取所有施工日
+									</button>
+								)}
+							</div>
 						</details>
 						<p className="old-caption">
 							{workDays?.length === 1
 								? `單一施工日 ${month}/${workDays[0]}：儲存工項時，本月數量自動同步到當天。`
-								: "未選擇時依施工日期顯示；未填施工日期則顯示整月。"}
+								: workDays && workDays.length > 0
+									? `已依路段施工日期（${site.work_dates}）自動連動顯示。`
+									: "未選擇時依施工日期顯示；未填施工日期則顯示整月。"}
 						</p>
 					</div>
 				</div>
