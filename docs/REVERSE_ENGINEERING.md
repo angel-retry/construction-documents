@@ -193,3 +193,210 @@ sequenceDiagram
 * **風險與影響**：
   * 專案儲存庫中未見 SQL 原始遷移檔（Migration scripts）版本化管理，造成邏輯黑箱。
   * 業務單元測試困難，無法在純前端或無連線狀態下單獨對業務規則進行單元測試（需依賴 Mock 或連線至真實 Supabase 實例）。
+
+
+---
+
+## 5. 前端 UI 頁面與表單元件索引地圖 (Next.js App Router & Component Mapping)
+
+本章節建立 Next.js 前端畫面元件與後端處理器、表單 Input 欄位名稱（`name`）、提交之 Server Action / API Route 以及後端 PostgreSQL RPC 的快速反查索引。
+
+```
+Next.js 路由架構樹：
+web/app/
+ ├── login/ (登入驗證)
+ ├── projects/ (標案清單與建立)
+ └── projects/[id]/ (單一標案工作區)
+      ├── page.tsx (標案基本設定視圖與表單)
+      ├── sites/ (施工路段管理與日期連動)
+      ├── quantities/ (數量看板、每日數量即時差量編輯)
+      ├── prior/ (前期累計剪貼簿編輯器)
+      ├── export/ (雙重快照核對與報表下載)
+      └── work-orders/ (派工單新增與維護)
+```
+
+---
+
+### 5.1 身份驗證模組 (Login)
+* **路由位置**：`/login`
+* **畫面檔案**：`web/app/login/page.tsx`、`web/app/login/form.tsx`
+* **後端動作**：`web/app/login/actions.ts:login`
+
+| 畫面控制項標籤 (Label) | 控制項類型 | Form Input `name` | 提交之 Action / API | 後端 Supabase 操作 | 說明 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **電子信箱** | `<input type="email">` | `email` | `login(previous, formData)` | `supabase.auth.signInWithPassword` | 登入帳號 |
+| **密碼** | `<input type="password">` | `password` | `login(previous, formData)` | `supabase.auth.signInWithPassword` | 登入密碼 |
+| **登入** | `<button type="submit">` | - | `login(previous, formData)` | 建立 Session Cookie | 成功後導向 `/projects` |
+
+---
+
+### 5.2 專案總覽與建立標案 (Projects List & Create)
+* **路由位置**：`/projects`
+* **畫面檔案**：`web/app/projects/page.tsx`、`web/app/projects/forms.tsx`
+* **後端動作**：`web/app/projects/actions.ts:createProject`
+
+| 畫面控制項標籤 (Label) | 控制項類型 | Form Input `name` | 提交之 Action / API | 後端 Supabase 操作 / RPC | 說明 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **所屬組織** | `<input type="hidden">` | `org_id` | `createProject` | 寫入 `projects.org_id` | 預設填入使用者所屬組織 ID |
+| **標案代碼** | `<input type="text">` | `code` | `createProject` | RPC `create_project(p_code)` | 唯一鍵值（如 `115-PARK-01`） |
+| **標案名稱** | `<input type="text">` | `name` | `createProject` | RPC `create_project(p_name)` | 工程名稱全名 |
+| **工程類別** | `<select>` | `kind` | `createProject` | RPC `create_project(p_kind)` | 選項：`park`（公園）、`rainwater`（雨水） |
+| **建立標案** | `<button type="submit">` | - | `createProject` | 呼叫 RPC 建立專案與初始期程 | 建立完成後自動導向 `/[id]` |
+
+---
+
+### 5.3 標案基本設定 (Project Settings)
+* **路由位置**：`/projects/[id]`
+* **畫面檔案**：`web/app/projects/[id]/page.tsx`、`web/app/projects/[id]/forms.tsx`
+* **後端動作**：`web/app/projects/actions.ts:saveSettings`
+
+| 畫面控制項標籤 (Label) | 控制項類型 | Form Input `name` | 提交之 Action / API | 後端 Supabase 操作 / RPC | 說明與約束 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **標案 ID** | `<input type="hidden">` | `id` | `saveSettings` | `projects.id` | 標案 UUID |
+| **樂觀鎖版本號** | `<input type="hidden">` | `revision` | `saveSettings` | RPC `save_project_settings(p_revision)` | 樂觀並發版本號，防多人覆蓋 |
+| **標案名稱** | `<input type="text">` | `name` | `saveSettings` | `projects.name` | 標案名稱 |
+| **主辦機關** | `<input type="text">` | `owner` | `saveSettings` | `projects.owner` | 預設「新北市中和區公所」 |
+| **承造廠商** | `<input type="text">` | `contractor` | `saveSettings` | `projects.contractor` | 預設「皇喆營造工程有限公司」 |
+| **監造單位** | `<input type="text">` | `supervisor` | `saveSettings` | `projects.supervisor` | 監造技術顧問單位 |
+| **施工地點** | `<input type="text">` | `location` | `saveSettings` | `projects.location` | 施工區域範圍 |
+| **契約金額** | `<input type="number">` | `amount` | `saveSettings` | `projects.contract_amount` | 契約核定直接工程費/總額 |
+| **儲存設定** | `<button type="submit">` | - | `saveSettings` | 呼叫 RPC 驗證並更新標案設定 | 成功後刷新頁面視圖 |
+
+---
+
+### 5.4 施工路段管理 (Site Management)
+* **路由位置**：`/projects/[id]/sites`
+* **畫面檔案**：`web/app/projects/[id]/sites/page.tsx`、`editor.tsx`、`site-manager.tsx`、`date-picker.tsx`、`assign-order.tsx`
+* **後端動作**：`web/app/projects/[id]/sites/actions.ts:saveSite`、`reorderSites`、`assignOrder`
+
+| 畫面控制項標籤 (Label) | 控制項類型 | Form Input `name` | 提交之 Action / API | 後端 Supabase 操作 / RPC | 說明與限制 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **項次 (路段編號)** | `<input type="number">` | `item_number` | `saveSite` | RPC `save_monthly_site(p_item_number)` | 月份內路段項次編號 |
+| **路段名稱** | `<input type="text">` | `name` | `saveSite` | RPC `save_monthly_site(p_name)` | 路段或派工地標名稱 |
+| **施工日期區間** | `<input type="text">` | `work_dates` | `saveSite` | RPC `save_monthly_site(p_work_dates)` | 格式如 `115/6/1-115/6/2`，帶檢核防呆 |
+| **日期選取器** | 客製元件 (`DatePicker`) | 連動 `work_dates` | Client-side 互動 | 自動轉換為民國格式字串 | 提供月曆點選以填入合法日期格式 |
+| **路段備註** | `<input type="text">` | `note` | `saveSite` | RPC `save_monthly_site(p_note)` | 單一路段備註說明 |
+| **案件類別** | `<select>` | `case_override` | `saveSite` | RPC `save_monthly_site(p_case_override)`| 值域：`""`、`normal`、`independent` |
+| **上移 / 下移 (排序)**| `<button>` | - | `reorderSites` | RPC `reorder_monthly_sites` | 批次更新 `display_order` 與項次 |
+| **指派派工單** | Modal 表單 | `order` 等 | `assignOrder` | RPC `assign_work_order_to_month` | 將未結派工單匯入該月份路段 |
+
+---
+
+### 5.5 數量看板與即時編輯 (Quantities Board)
+* **路由位置**：`/projects/[id]/quantities`
+* **畫面檔案**：`web/app/projects/[id]/quantities/page.tsx`、`board.tsx`
+* **後端處理**：`web/app/projects/[id]/quantities/actions.ts:saveItem`、`addItem` 及路由端點 `save/route.ts`
+
+| 畫面控制項標籤 (Label) | 控制項類型 | Form Input / Key | 提交之 Action / API | 後端 Supabase 操作 / RPC | 說明與機制 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **加入工項** | `<select>` + `<button>` | `site`, `code` | `addItem` | RPC `add_monthly_item` | 依合約目錄建立 `item_period_targets` |
+| **本月目標數量** | `<input type="number">` | `target` | `save/route.ts` ➔ `saveItem` | RPC `save_monthly_item(p_target)` | 當月工項施作數量上限 |
+| **工項算式/備註** | `<textarea>` | `note` | `save/route.ts` ➔ `saveItem` | RPC `save_monthly_item(p_note)` | 填寫尺寸算式，供報表分析欄位套印 |
+| **每日數量儲存格 (1~31日)**| 客製元件 (`Cell`) | `day:{n}` | `QuantitySaveQueue.submit()` ➔ `save/route.ts` | RPC `save_monthly_item(p_days)` | 透過前端差量佇列非同步發送更新 |
+| **移除工項** | `<button>` | `operation="remove"`| `save/route.ts` ➔ `saveItem` | RPC `save_monthly_item(p_remove=true)` | 刪除工項並連帶移除每日數量 |
+
+---
+
+### 5.6 前期累計編輯器 (Prior Balances)
+* **路由位置**：`/projects/[id]/prior`
+* **畫面檔案**：`web/app/projects/[id]/prior/page.tsx`、`editor.tsx`
+* **後端動作**：`web/app/projects/[id]/prior/actions.ts:savePrior`
+
+| 畫面控制項標籤 (Label) | 控制項類型 | Form Input `name` | 提交之 Action / API | 後端 Supabase 操作 / RPC | 說明 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **前期代碼剪貼簿** | `<textarea>` | `codes` | `savePrior` | RPC `save_prior_balances` | 自 Excel 整欄複製貼上之工項代碼 |
+| **前期數量剪貼簿** | `<textarea>` | `quantities` | `savePrior` | RPC `save_prior_balances` | 自 Excel 整欄複製貼上之前期完成數量 |
+| **套用前期累計並儲存** | `<button type="submit">` | - | `savePrior` | 批次更新 `opening_balances` | 自動核對欄位長度並產生差額預覽 |
+
+---
+
+### 5.7 報表匯出與快照下載 (Export)
+* **路由位置**：`/projects/[id]/export`
+* **畫面檔案**：`web/app/projects/[id]/export/page.tsx`、`form.tsx`
+* **後端處理**：`web/app/projects/[id]/export/download/route.ts`、`web/lib/excel-worker.ts`
+
+| 畫面控制項標籤 (Label) | 控制項類型 | Form Input `name` | 提交之 Action / API | 後端處理與 Worker | 說明 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **當前快照雜湊** | `<input type="hidden">` | `snapshot` | `POST /export/download` | 比對雙重讀取 Hash | 防止讀取與匯出期間資料被他人修改 |
+| **申報年份** | `<input type="hidden">` | `year` | `POST /export/download` | 傳送至 `exportSnapshot` | 申報民國年 |
+| **申報月份** | `<input type="hidden">` | `month` | `POST /export/download` | 傳送至 `exportSnapshot` | 申報月份 |
+| **產生並下載 Excel** | `<button type="submit">` | - | `POST /export/download` | 調用 Python 子行程產檔 | 成功時直接回傳 ZIP 二進位檔案下載 |
+
+---
+
+## 6. 前端狀態管理與差量儲存機制 (State Management & Save Queue)
+
+為解決早期版本在多人同時編輯同一月份表格時的互相覆寫問題，Next.js 版本引進了 **按工項行獨立維護的前端佇列系統 (`QuantitySaveQueue`)** 與 **雙層版本號樂觀鎖機制**。
+
+### 6.1 前端差量佇列 (`QuantitySaveQueue`) 運作原理
+
+1. **記憶體狀態結構**：
+   * `saved`：代表伺服器已確認寫入的資料快照。
+   * `draft`：使用者當前在畫面上編輯的最新數值。
+   * `queued`：當前景端正在發送網路請求時，若使用者又輸入新數字，新數字會暫存於 `queued`。
+   * `busy`：布林值，標記當前此行是否正在執行 HTTP 傳輸。
+2. **差量補丁發送 (`quantityPatch`)**：
+   * 使用者在任一格子輸入完畢失焦（`onBlur`）時，佇列器比對 `draft` 與 `saved`：
+   ```typescript
+   // 僅抽出數值有變動的日期格子，不發送全月 31 天的全部數據
+   const patch: Record<number, number> = {};
+   for (const [day, qty] of Object.entries(draft.days)) {
+     if (saved.days[day] !== qty) patch[Number(day)] = qty;
+   }
+   ```
+3. **雙版本號防並發踩踏 (Dual Revisions)**：
+   * 每次請求均攜帶兩個樂觀鎖：
+     * `revision`：該工項行（`item_period_targets`）的目前版本號。
+     * `site_revision`：所屬路段（`monthly_sites`）的目前版本號（防止路段施工日期剛好被其他人修改）。
+   * 資料庫端於 RPC `save_monthly_item` 內部校驗版本，若不符則拒絕寫入並丟出 PostgreSQL 例外 `40001`。
+
+---
+
+## 7. 三向追溯表 (Next.js UI Input ➔ Supabase DB Schema ➔ Python Worker / Excel)
+
+| 畫面功能 / 欄位 | Next.js 表單 Input | Supabase 資料表與欄位 | Python Worker 快照欄位 | Excel 範本最終位置 |
+| :--- | :--- | :--- | :--- | :--- |
+| **標案工程名稱** | `forms.tsx: name` | `projects.name` | `project.project_name` | `結算單封面!A2`、`施工日誌!A2` |
+| **主辦機關單位** | `forms.tsx: owner` | `projects.owner` | `project.owner` | `結算單封面!A1`、`施工日誌!B3` |
+| **契約核定金額** | `forms.tsx: amount` | `projects.contract_amount` | `project.contract_amount` | `詳細表連結!C3` |
+| **路段名稱** | `editor.tsx: name` | `monthly_sites.name` | `sites[].name` | `施工路段表!B{row}`、`04.數量分析!B{row}` |
+| **施工日期區間** | `editor.tsx: work_dates`| `monthly_sites.work_dates` | `sites[].work_dates` | `施工路段表!C{row}` |
+| **工項備註/算式** | `board.tsx: note` | `item_period_targets.note` | `item_notes["{sid}\|{code}"]`| `04.數量分析!H{row}` 算式欄 |
+| **每日施作數量** | `board.tsx: Cell` | `daily_quantities.quantity` | `quantities[].quantity` | `04.數量分析` 第 14 欄起 (1~31日) |
+| **前期累計完成量**| `editor.tsx: quantities`| `opening_balances.quantity`| `prior_cumulative[code]` | `詳細表連結!E{row}` |
+| **派工單案件編號**| `assign-order.tsx: order`| `work_orders.number` | `park_cover["dispatch_{uid}"]` | 公園獨立派工封面 `R9` 派工單號 |
+
+---
+
+## 8. Streamlit 原版 vs Next.js 翻寫版功能對齊與落差分析 (Feature Parity Gap Analysis)
+
+本章節為將 Next.js 專案完全對齊 Streamlit 原版功能的核心檢核清單。
+
+### 8.1 核心功能對齊矩陣 (Parity Matrix)
+
+| 業務功能項目 | Streamlit 原版實作位置 | Next.js 翻寫版目前狀態 | 對齊差距等級 | 功能落差與補齊方向分析 |
+| :--- | :--- | :--- | :--- | :--- |
+| **1. 單一施工日自動同步** | [quantities.py#L76](file:///c:/Users/angel.wei/code/jin02/app/quantities.py#L76)<br>`sync_single_day_quantity` | **未完整實作** | **高 (High)** | **落差**：Streamlit 中，當路段只有單一施作日（如 `115/8/1`）時，使用者輸入本月數量會自動寫入該天的每日數量，不必手動到看板點格子。Next.js 目前需使用者手動在看板各別填寫。 |
+| **2. 既有結算單 Excel 逆向匯入**| [importer.py](file:///c:/Users/angel.wei/code/jin02/app/importer.py)<br>`import_settlement` | **缺失 (Missing)** | **高 (High)** | **落差**：Streamlit 可直接上傳舊有公所結算單 `.xlsx`，自動拆解並還原成系統資料；Next.js 目前僅能手動建立或從 Supabase 既有資料庫載入，無 Excel 逆向匯入解析器。 |
+| **3. 專案 JSON 檔案匯出/還原** | [layout.py#L51](file:///c:/Users/angel.wei/code/jin02/app/pages/layout.py#L51)<br>`sidebar_project_io` | **缺失 (Missing)** | **中 (Medium)** | **落差**：Streamlit 支援隨時下載整個專案的 JSON 備份檔，並可於側邊欄上傳覆蓋還原；Next.js 僅能透過資料庫儲存，缺少本機離線 JSON 專案檔匯入/匯出能力。 |
+| **4. 結算單封面單號手動動態配置**| [park_cover.py](file:///c:/Users/angel.wei/code/jin02/app/park_cover.py)<br>`render_park_cover_settings` | **部分實作 (Partial)** | **中 (Medium)** | **落差**：Streamlit 允許使用者在前端動態填寫上旬與下旬的完整結算單編號（如 `1142308194-17`），並即時注入封面 `C9`、`J9`。Next.js 目前僅能在路段名稱標注派工單號，缺少專屬的封面號碼維護介面。 |
+| **5. 契約變更設計歷程表格** | [settings.py#L81](file:///c:/Users/angel.wei/code/jin02/app/pages/settings.py#L81)<br>`contract_revisions` | **部分實作 (Partial)** | **中 (Medium)** | **落差**：Next.js 在 DB 有 `contract_versions` 表，但前端「基本設定」頁面缺少像 Streamlit 那樣動態增刪「第 N 次變更設計金額與生效日」的互動表格編輯器。 |
+| **6. 超過 18 列路段匯出阻斷** | Streamlit 無 18 列限制 | **存在硬限制 (Bug/Limitation)**| **緊急 (Critical)** | **落差**：Next.js 版的 `web_excel_worker.py:30` 硬編碼了 `len(sites) > 18` 拋錯，若單月路段達 19 個以上匯出會直接崩潰；Streamlit 原版支援超過 18 列的動態擴展與處理。 |
+| **7. 15 萬元門檻自動判斷拆單** | [models.py#L181](file:///c:/Users/angel.wei/code/jin02/app/models.py#L181)<br>`effective_case_type` | **已對齊 (Aligned)** | **無 (None)** | 兩者皆以 150,000 元作為自動判定獨立派工案門檻，且均支援前端手動下拉覆寫（`case_override`）。 |
+| **8. 前期累計剪貼簿批次貼上** | [prior.py](file:///c:/Users/angel.wei/code/jin02/app/pages/prior.py)<br>`prior_paste_preview` | **已對齊 (Aligned)** | **無 (None)** | Next.js 於 `editor.tsx` 完整移植了 Excel 兩欄複製貼上、逐列核對與差額計算預覽機制。 |
+| **9. 施工日誌與結算單 Excel 套印**| [exporter.py](file:///c:/Users/angel.wei/code/jin02/app/exporter.py) | **已對齊 (Aligned)** | **無 (None)** | Next.js 透過 Python Worker（`web_excel_worker.py`）呼叫相同的 `openpyxl` 範本套印邏輯，產出完全一致的試算表。 |
+
+---
+
+### 8.2 建議優先推動之 Next.js 補齊路徑 (Action Items)
+
+若要讓 Next.js 達成與 Streamlit 100% 同等之體驗，建議依以下順序推動改造：
+
+1. **優先解除 18 列路段限制**：
+   * 修改 `migration_tools/web_excel_worker.py`，移除 `len(sites) > 18` 之硬編碼例外，改為調用 Streamlit 原版之動態分頁或模組。
+2. **實作「單一施工日自動同步」行為**：
+   * 在 Next.js 的 `web/app/projects/[id]/quantities/board.tsx` 或後端 Action 中，檢查路段 `work_dates` 若僅有單一日期，於使用者修改 `target`（本月數量）時，自動觸發當天 `daily_quantities` 寫入，減少現場人員重複輸入工時。
+3. **增加結算單封面設定 UI**：
+   * 在 `web/app/projects/[id]/export/form.tsx` 增加「結算單封面單號」欄位（上旬編號、下旬編號），並將其寫入快照傳遞至 Python Worker。
+4. **補齊變更設計歷程編輯介面**：
+   * 在 `web/app/projects/[id]/page.tsx` 增加動態表格，讓使用者能直接新增/刪除多筆契約變更金額與生效日，同步寫入 `contract_versions` 資料表。
