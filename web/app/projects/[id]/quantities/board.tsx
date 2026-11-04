@@ -117,7 +117,7 @@ export default function QuantityBoard({
 				<h2>每日完成數量</h2>
 			</div>
 			<p className="old-caption">
-				左側填本月數量與備註，備註框可拖曳右下角調整大小；右側分配每日完成數量。離開工項區塊會在背景自動儲存，可繼續輸入下一個工項；也可按「儲存工項」。顯示日期只篩選畫面，隱藏日期仍計入合計。
+				左側填本月數量與備註，備註框可拖曳右下角調整大小；右側分配每日完成數量。離開輸入框或按 Enter 鍵會在背景自動儲存，可連續流暢填報。顯示日期只篩選畫面，隱藏日期仍計入合計。
 			</p>
 			{!editable && <p>此標案或月份為唯讀。</p>}
 			{sites.map((site: any) => (
@@ -281,31 +281,37 @@ function SiteBlock({
 					<div className="quantity-account">
 						<span />
 						<span>工項代碼</span>
-						<span>工作項目</span>
-						<span>
-							本月數量
-							<br />
-							（可編輯）
-						</span>
-						<span>單價</span>
-						<span>本月金額</span>
-						<span>備註</span>
+						<span>工作項目規格</span>
+						<span className="text-right">本月數量</span>
+						<span className="text-right">單價</span>
+						<span className="text-right">本月金額</span>
+						<span style={{ paddingLeft: "4px" }}>備註 / 尺寸算式</span>
 					</div>
-					<span>每日完成數量（各工項與左側同列，可橫向捲動日期）</span>
+					<div className="quantity-daily-head">
+						<span>每日完成數量（橫向捲動填報）</span>
+						<span className="quantity-daily-hint">可橫向捲動查看日期 ➔</span>
+					</div>
 				</div>
-				{!rows.length && <p>尚未加入工項。</p>}
-				{rows.map((t: any) => (
-					<ItemRow
-						key={`${t.id}:${site.revision}`}
-						target={t}
-						site={site}
-						daily={daily.filter(
-							(d: any) => d.work_order_item_id === t.work_order_item_id,
-						)}
-						{...{ year, month, visible, editable, onAmount, onSaved, onStatus }}
-						singleDay={workDays?.length === 1 ? workDays[0] : null}
-					/>
-				))}
+				{!rows.length ? (
+					<div className="quantity-empty-state">
+						<p>目前尚未加入任何工項，請從上方搜尋並加入契約工項。</p>
+					</div>
+				) : (
+					<div className="quantity-rows-container">
+						{rows.map((t: any) => (
+							<ItemRow
+								key={`${t.id}:${site.revision}`}
+								target={t}
+								site={site}
+								daily={daily.filter(
+									(d: any) => d.work_order_item_id === t.work_order_item_id,
+								)}
+								{...{ year, month, visible, editable, onAmount, onSaved, onStatus }}
+								singleDay={workDays?.length === 1 ? workDays[0] : null}
+							/>
+						))}
+					</div>
+				)}
 				<p>已儲存小計：{money(subtotal)} 元</p>
 			</div>
 		</details>
@@ -398,10 +404,7 @@ function ItemRow({
 			className="quantity-item"
 			onSubmit={(e) => {
 				e.preventDefault();
-				const remove =
-					(e.nativeEvent as SubmitEvent).submitter?.getAttribute("value") ===
-					"remove";
-				void queue.submit(remove, !!syncNeeded);
+				void queue.submit(false, !!syncNeeded);
 			}}
 			onBlur={(e) => {
 				if (
@@ -419,20 +422,20 @@ function ItemRow({
 				<div className="quantity-pair">
 					<div className="quantity-account">
 						<button
-							type="submit"
-							name="operation"
-							value="remove"
+							type="button"
 							disabled={queue.busy}
-							className="quantity-remove"
+							className="quantity-remove-btn"
 							aria-label={`移除工項 ${item.code}（可恢復）`}
 							title="移除工項（可恢復）"
+							onClick={() => void queue.submit(true)}
 						>
 							×
 						</button>
-						<span>{item.code}</span>
-						<span>
-							{item.name}（{item.unit}）
-						</span>
+						<span className="item-code font-mono">{item.code}</span>
+						<div className="item-name-group">
+							<div className="item-title" title={item.name}>{item.name}</div>
+							<div className="item-unit">單位：{item.unit}</div>
+						</div>
 						<label>
 							<span className="quantity-mobile-label">本月數量</span>
 							<input
@@ -443,14 +446,20 @@ function ItemRow({
 								max="999999999999.9999"
 								step="0.0001"
 								value={qty}
+								className="font-mono text-right"
 								onChange={(e) => edit({ target: e.target.value })}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") {
+										e.currentTarget.blur();
+									}
+								}}
 							/>
 						</label>
-						<span>
+						<span className="item-price font-mono">
 							<span className="quantity-mobile-label">單價</span>
 							{money(Number(item.unit_price))}
 						</span>
-						<span>
+						<span className="item-amount font-mono">
 							<span className="quantity-mobile-label">本月金額</span>
 							{money(amount)}
 						</span>
@@ -460,9 +469,9 @@ function ItemRow({
 								className="quantity-note"
 								aria-label={`${item.code} 備註`}
 								name="note"
-								rows={3}
-								title="拖曳右下角可調整備註框大小"
-								placeholder="選填，可拖曳右下角放大"
+								rows={2}
+								title="尺寸算式..."
+								placeholder="尺寸算式..."
 								maxLength={2000}
 								value={note}
 								onChange={(e) => edit({ note: e.target.value })}
@@ -503,6 +512,11 @@ function ItemRow({
 															days: { ...values, [date(d)]: e.target.value },
 														})
 													}
+													onKeyDown={(e) => {
+														if (e.key === "Enter") {
+															e.currentTarget.blur();
+														}
+													}}
 												/>
 											</td>
 										))}
@@ -510,27 +524,39 @@ function ItemRow({
 								</tbody>
 							</table>
 						</div>
-						<p>
-							每日合計：{allocated.toFixed(4)}｜
-							{remaining < 0
-								? `超出本月數量 ${(-remaining).toFixed(4)}`
-								: `尚可分配 ${remaining.toFixed(4)}`}
-						</p>
+						<div className="quantity-allocated-summary">
+							<span>每日合計：<strong className="font-mono">{allocated.toFixed(4)}</strong></span>
+							<span className={remaining < 0 ? "quantity-status-over" : remaining === 0 ? "quantity-status-exact" : "quantity-status-rem"}>
+								{remaining < 0 ? `超出 ${(-remaining).toFixed(4)}` : remaining === 0 ? "✓ 已完全分配" : `尚可分配 ${remaining.toFixed(4)}`}
+							</span>
+						</div>
 					</div>
 				</div>
-				{syncNeeded && <p>單日數量尚待同步，請按「儲存工項」。</p>}
-				<button className="quantity-save" type="submit">
-					{queue.failed ? "重試儲存" : "儲存工項"}
-				</button>
 			</fieldset>
-			<p role="status">
-				{queue.busy
-					? "儲存中…"
-					: queue.failed
-						? `儲存失敗：${queue.message}`
-						: queue.message}
-				{queue.dirty ? " 有尚未儲存的變更。" : ""}
-			</p>
+			{(queue.busy || queue.failed || queue.dirty || queue.message) && (
+				<div
+					role="status"
+					className={`quantity-status-bar ${queue.failed ? "is-error" : ""}`}
+				>
+					<span>
+						{queue.busy
+							? "儲存中…"
+							: queue.failed
+								? `儲存失敗：${queue.message}`
+								: queue.message}
+						{queue.dirty ? "（有未儲存的變更）" : ""}
+					</span>
+					{queue.failed && (
+						<button
+							type="button"
+							className="quantity-retry-btn"
+							onClick={() => void queue.submit()}
+						>
+							點此重試儲存
+						</button>
+					)}
+				</div>
+			)}
 		</form>
 	);
 }
