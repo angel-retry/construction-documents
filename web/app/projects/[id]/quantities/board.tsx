@@ -7,6 +7,7 @@ import {
 	useState,
 } from "react";
 import { addItem } from "./actions";
+import { ItemCombobox } from "./item-combobox";
 import { workDatesToDays } from "../../../../lib/legacy-work-dates";
 import { itemAmount, monthQuantity } from "../../../../lib/quantity-math";
 import {
@@ -153,11 +154,17 @@ function SiteBlock({
 	onStatus,
 }: any) {
 	const [filter, setFilter] = useState<number[]>([]);
-	const [search, setSearch] = useState("");
 	const [code, setCode] = useState("");
+	const [resetKey, setResetKey] = useState(0);
 	const [addState, addAction, adding] = useActionState(addItem, {
 		message: "",
 	});
+	useEffect(() => {
+		if (addState.ok) {
+			setCode("");
+			setResetKey((k) => k + 1);
+		}
+	}, [addState]);
 	const count = new Date(Date.UTC(year + 1911, month, 0)).getUTCDate();
 	const all = Array.from({ length: count }, (_, i) => i + 1);
 	const workDays = workDatesToDays(site.work_dates, year + 1911, month);
@@ -187,9 +194,7 @@ function SiteBlock({
 	const used = new Set(
 		rows.map((t: any) => t.work_order_items.contract_items.code),
 	);
-	const available = catalog.filter(
-		(c: any) => !used.has(c.code) && `${c.code} ${c.name}`.includes(search),
-	);
+	const available = catalog.filter((c: any) => !used.has(c.code));
 	const subtotal = rows.reduce(
 		(sum: number, t: any) =>
 			sum +
@@ -212,35 +217,18 @@ function SiteBlock({
 							disabled={!editable || adding}
 							style={{ border: 0, padding: 0 }}
 						>
-							<label className="old-field">
-								搜尋工項
-								<input
-									value={search}
-									onChange={(e) => {
-										setSearch(e.target.value);
-										setCode("");
-									}}
-									placeholder="工項代碼或名稱"
-								/>
-							</label>
 							<div className="quantity-add">
 								<label className="old-field">
 									加入工項（可搜尋）
-									<select
+									<ItemCombobox
+										availableItems={available}
 										name="code"
-										required
-										value={code}
-										onChange={(e) => setCode(e.target.value)}
-									>
-										<option value="">請選擇工項</option>
-										{available.map((c: any) => (
-											<option key={c.code} value={c.code}>
-												{c.code}｜{c.name}（{c.unit}）
-											</option>
-										))}
-									</select>
+										disabled={!editable || adding}
+										resetKey={resetKey}
+										onSelectChange={setCode}
+									/>
 								</label>
-								<button className="old-primary" disabled={!code}>
+								<button className="old-primary" disabled={!code || adding}>
 									{adding ? "加入中…" : "加入"}
 								</button>
 							</div>
@@ -287,13 +275,6 @@ function SiteBlock({
 								)}
 							</div>
 						</details>
-						<p className="old-caption">
-							{workDays?.length === 1
-								? `單一施工日 ${month}/${workDays[0]}：儲存工項時，本月數量自動同步到當天。`
-								: workDays && workDays.length > 0
-									? `已依路段施工日期（${site.work_dates}）自動連動顯示。`
-									: "未選擇時依施工日期顯示；未填施工日期則顯示整月。"}
-						</p>
 					</div>
 				</div>
 				<div className="quantity-pair quantity-column-head">

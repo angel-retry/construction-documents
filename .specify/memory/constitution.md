@@ -30,6 +30,8 @@ Sync Impact Report:
 ### Principle IV: Traditional Chinese & Documentation Integrity (繁體中文註釋與文檔嚴肅性)
 專案文檔與原始碼必須維護一致的繁體中文溝通標準：
 * 所有新增或修改的原始碼註釋、提交訊息（Commit Message）及架構文件，一律使用繁體中文。
+* **Spec-Driven 產出標準**：由 Spec-Kit 產生之所有檔案（包含 `spec.md`、`plan.md`、`tasks.md` 及 `checklists/` 檢核表），必須 100% 使用繁體中文，禁止使用英文模板佔位符。
+* **使用者故事句型規範**：所有 User Story 一律遵循「作為 [角色]，在 [操作情境/頁面路徑] 時，我希望 [期望功能]，避免 [操作痛點/錯誤]」句型，並搭配 Given-When-Then 與 `---` 分段。
 * 程式碼註釋中不得使用表情符號（Emoji）或裝飾性符號。
 * 嚴格維護既有註釋與 JSDoc/TSDoc 的完整性，非任務必要範圍不擅自刪改或重構。
 

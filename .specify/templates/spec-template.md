@@ -1,131 +1,95 @@
-# Feature Specification: [FEATURE NAME]
+# Feature Specification: [功能名稱]
 
-**Feature Branch**: `[###-feature-name]`
+**Feature Branch**: `[###-feature-name]`  
+**Created**: [日期]  
+**Status**: Draft  
+**Input**: [使用者原始需求描述或網址連結]
 
-**Created**: [DATE]
-
-**Status**: Draft
-
-**Input**: User description: "$ARGUMENTS"
+---
 
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
-  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
-
-  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
-  Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
+  重要準則：
+  1. 使用者故事（User Stories）必須按重要性排序（P1、P2、P3 等）。
+  2. 每個故事必須具備獨立可測試性（Independently Testable）——即單獨實作該故事即可交付最小可行價值（MVP）。
+  3. 句型必須嚴格遵循：「作為 [角色]，在 [操作情境/頁面路徑] 時，我希望 [期望功能]，避免 [操作痛點/錯誤]」。
+  4. 故事之間必須以 `---` 水平線分隔。
 -->
 
-### User Story 1 - [Brief Title] (Priority: P1)
+### User Story 1 - [簡要標題] (Priority: P1)
 
-[Describe this user journey in plain language]
+作為 [角色，例如：工程核銷與監工人員]，在 [操作情境/頁面路徑，例如：查看「每日數量與帳務總覽」（/quantities）] 時，我希望 [期望達成的功能或行為]，避免 [操作痛點、重複勞動或資料不一致風險]。
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this priority**: [說明為何具備此優先級，闡述其對核心業務流程的價值]
 
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
+**Independent Test**:
+[描述如何獨立驗證此功能——例如：進入特定頁面操作特定步驟，確認獲得特定結果]
 
 **Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** [初始狀態/前提條件]，  
+   **When** [使用者執行的操作]，  
+   **Then** [系統預期產生的結果/畫面呈現]。
+2. **Given** [初始狀態/前提條件]，  
+   **When** [使用者執行的操作]，  
+   **Then** [系統預期產生的結果/畫面呈現]。
 
 ---
 
-### User Story 2 - [Brief Title] (Priority: P2)
+### User Story 2 - [簡要標題] (Priority: P2)
 
-[Describe this user journey in plain language]
+作為 [角色]，在 [操作情境/頁面路徑] 時，我希望 [期望達成的功能或行為]，避免 [操作痛點/錯誤]。
 
-**Why this priority**: [Explain the value and why it has this priority level]
+**Why this priority**: [說明次要優先級之原因]
 
-**Independent Test**: [Describe how this can be tested independently]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-
----
-
-### User Story 3 - [Brief Title] (Priority: P3)
-
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently]
+**Independent Test**:
+[描述獨立驗證步驟]
 
 **Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+1. **Given** [初始狀態/前提條件]，  
+   **When** [使用者執行的操作]，  
+   **Then** [系統預期產生的結果/畫面呈現]。
 
 ---
-
-[Add more user stories as needed, each with an assigned priority]
 
 ### Edge Cases
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right edge cases.
--->
+- **[邊界或異常情境 1]**：[描述極端輸入、資料缺失或異常網路狀態下的系統安全回退（Fallback）行為]
+- **[邊界或異常情境 2]**：[描述特殊操作順序或防呆機制]
 
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+---
 
 ## Requirements *(mandatory)*
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right functional requirements.
--->
-
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-001**: 系統必須 [具體功能能力，例如：在路段展開時自動讀取特定欄位並進行反向解析]。
+- **FR-002**: 系統必須 [具體功能能力，例如：支援即時包含比對篩選]。
+- **FR-003**: 使用者必須能夠 [關鍵互動操作，例如：點擊選取工項後自動連動隱藏欄位]。
+- **FR-004**: 系統必須 [資料與狀態要求，例如：維持後端 Server Action 呼叫契約相容]。
+- **FR-005**: 系統必須 [安全或防呆要求，例如：未選擇有效項目時停用送出按鈕]。
 
-*Example of marking unclear requirements:*
+---
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+### Key Entities
 
-### Key Entities *(include if feature involves data)*
+- **[實體名稱 1]**: [說明其代表之領域實體、資料表對應與關鍵欄位]。
+- **[實體名稱 2]**: [說明其代表之領域實體或前端元件狀態]。
 
-- **[Entity 1]**: [What it represents, key attributes without implementation]
-- **[Entity 2]**: [What it represents, relationships to other entities]
+---
 
 ## Success Criteria *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
--->
-
 ### Measurable Outcomes
 
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+- **SC-001**: [可衡量的量化指標，例如：操作動線縮短 50% 或使用者完成選取的時間低於 3 秒]。
+- **SC-002**: [效能指標，例如：篩選回饋時間低於 50 毫秒，展開選單時下方表格維持 0 像素位移]。
+- **SC-003**: [準確率或相容性指標，例如：表單送出成功率達 100%，完全相容現有資料結構]。
+
+---
 
 ## Assumptions
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right assumptions based on reasonable defaults
-  chosen when the feature description did not specify certain details.
--->
-
-- [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
-- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
-- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+- [關於專案既有架構與環境之基本假設，例如：維持現有 Next.js 16 App Router 與 Supabase 架構]。
+- [關於依賴模組之假設，例如：沿用既有之工具函式庫]。
+- [關於範疇邊界之假設，例如：本次改動僅限於指定頁面之互動體驗，不變更後端資料表結構]。
